@@ -13,6 +13,12 @@
 #include "scope_guards.hpp"
 
 
+
+#include <easylogging++.h>
+#include <easylogging++.cc>
+INITIALIZE_EASYLOGGINGPP
+
+
 class Name
 {
 private:
@@ -26,12 +32,8 @@ public:
   ~Name()
     {
       std::cout << "Bye!" << "\n";
-
     }
 };
-
-
-
 
 using Allocator = saloc::FreelistAllocator<saloc::Mallocator<>, 8, 10>;
 int main()
@@ -44,60 +46,13 @@ int main()
 //     SCOPE_EXIT(p->~Name();aloc.deallocate(blk)); 
 //   }
 
-  Allocator allocator(5);
-  std::cout << sizeof(Name) << "\n";
-  auto p1 = allocator.allocate(sizeof(int));
-  auto p2 = allocator.allocate(sizeof(int));
-  auto p3 = allocator.allocate(sizeof(int));
-  auto p4 = allocator.allocate(sizeof(int));
-  auto p5 = allocator.allocate(sizeof(int));
-  auto p6 = allocator.allocate(sizeof(int));
-  auto p7 = allocator.allocate(sizeof(int));
-  auto p8 = allocator.allocate(2*sizeof(Name));
+  LOG(INFO) << "Where you from, my nigga?";
+  
 
-  std::cout << p1.ptr << "\n";
-  std::cout << p2.ptr << "\n";
-  std::cout << p3.ptr << "\n";
-  std::cout << p4.ptr << "\n";
-  std::cout << p5.ptr << "\n";
-  std::cout << p6.ptr << "\n";
-  std::cout << p7.ptr << "\n";
-  std::cout << p8.ptr << "\n";
-
-  allocator.deallocate(p1);
-  allocator.deallocate(p2);
-  allocator.deallocate(p3);
-  allocator.deallocate(p4);
-  allocator.deallocate(p5);
-  allocator.deallocate(p6);
-  allocator.deallocate(p7);
-  allocator.deallocate(p8);
-
-  std::cout << "NEW--------------------New" << "\n";
-
-   p1 = allocator.allocate(sizeof(double));
-   p2 = allocator.allocate(sizeof(double));
-   p3 = allocator.allocate(sizeof(double));
-   p4 = allocator.allocate(sizeof(double));
-   p5 = allocator.allocate(sizeof(double));
-   p6 = allocator.allocate(sizeof(double));
-   p7 = allocator.allocate(sizeof(double));
-   p8 = allocator.allocate(sizeof(Name));
-
-   std::cout << p1.ptr << "\n";
-   std::cout << p2.ptr << "\n";
-   std::cout << p3.ptr << "\n";
-   std::cout << p4.ptr << "\n";
-   std::cout << p5.ptr << "\n";
-   std::cout << p6.ptr << "\n";
-   std::cout << p7.ptr << "\n";
-   std::cout << p8.ptr << "\n";
 
   
 
   
-
-  
-   return 0;
+  return 0;
 
 }
