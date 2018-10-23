@@ -13,12 +13,6 @@
 #include "scope_guards.hpp"
 
 
-
-#include <easylogging++.h>
-#include <easylogging++.cc>
-INITIALIZE_EASYLOGGINGPP
-
-
 class Name
 {
 private:
