@@ -30,23 +30,16 @@ public:
 };
 
 using Allocator = saloc::FreelistAllocator<saloc::Mallocator<>, 8, 10>;
+
 int main()
 {
-//   Allocator aloc;
-//   std::cout << sizeof(Name) << "\n";
-//   saloc::Blk blk = aloc.allocate(sizeof(Name));
-//   {
-//     Name *p = new (blk.ptr) Name("sad");
-//     SCOPE_EXIT(p->~Name();aloc.deallocate(blk)); 
-//   }
+  Allocator aloc(10);
+  saloc::Blk blk = aloc.allocate(sizeof(Name));
+  {
+    Name *p = new (blk.ptr) Name("sad");
+    SCOPE_EXIT(p->~Name();aloc.deallocate(blk)); 
+  }
 
-  LOG(INFO) << "Where you from, my nigga?";
-  
-
-
-  
-
-  
   return 0;
 
 }

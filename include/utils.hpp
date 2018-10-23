@@ -13,17 +13,21 @@ namespace saloc
   std::size_t roundToAllign(std::size_t n, std::size_t alignment = saloc::WORD_SIZE)
   {
     return ((n  / alignment) + 1) * alignment;
-  }  
+  }
+
+  
   struct Blk
   {
     void* ptr;
     std::size_t size;
   };
 
+
+  
   class Allocator
   {
-    virtual Blk allocate(std::size_t n) = 0;
-    virtual void deallocate(std::size_t n) = 0;
+    virtual Blk allocate(const std::size_t n) = 0;
+    virtual void deallocate(const std::size_t n) = 0;
   };
   
 }

@@ -1,5 +1,7 @@
 #pragma once
 #include <functional>
+#include "utils.hpp"
+
 
 namespace scope_guarding
 {

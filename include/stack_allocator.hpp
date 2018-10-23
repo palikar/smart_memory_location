@@ -4,7 +4,7 @@
 namespace saloc
 {  
   template <std::size_t N>
-  class StackAllocator
+  class StackAllocator : public saloc::Allocator
   {
   private:
     char stack[N]; // the buffer for all the pointers
@@ -15,7 +15,7 @@ namespace saloc
         std::memset(stack, 0, N);        
       }
 
-    Blk allocate(std::size_t n) noexcept
+    Blk allocate(const std::size_t n)
       {
         std::size_t  n1 = saloc::roundToAllign(n);
         if ((stack + N) - pos <  n1)
@@ -27,13 +27,13 @@ namespace saloc
         return blk;
       }
 
-    void deallocateAll() noexcept
+    void deallocateAll()
       {
         std::memset(stack, 0, (pos - stack));
         pos = stack;
       }
 
-    void deallocate(Blk blk) noexcept
+    void deallocate(const Blk blk)
       {
         auto ptr = static_cast<char*>(blk.ptr);
         if(ptr + blk.size == pos)
