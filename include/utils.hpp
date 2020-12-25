@@ -5,29 +5,39 @@
 #include <cstring>
 #include <stdlib.h>
 
-namespace saloc
+namespace detail
 {
-  constexpr std::size_t ONE_KB = 1024;
-  constexpr std::size_t WORD_SIZE = sizeof(size_t);
-  
-  std::size_t roundToAllign(std::size_t n, std::size_t alignment = saloc::WORD_SIZE)
-  {
-    return ((n  / alignment) + 1) * alignment;
-  }
 
-  
-  struct Blk
-  {
-    void* ptr;
-    std::size_t size;
-  };
+template<typename Fun>
+struct __scope_exit {
+    Fun __fun;
 
+    ~__scope_exit()
+    {
+        __fun();
+    }
 
-  
-  class Allocator
-  {
-    virtual Blk allocate(const std::size_t n) = 0;
-    virtual void deallocate(const std::size_t n) = 0;
-  };
-  
+};
+
+enum class __scope_guard{};
+
+template<typename Fun>
+__scope_exit<Fun>
+operator+ (__scope_guard, Fun&& fun)
+{
+    return __scope_exit<Fun>{fun};
 }
+
+
+}
+
+#define CONCAT_IMPL(s1, s2) s1##s2
+#define CONCAT(s1, s2) CONCAT_IMPL(s1, s2)
+#define ANONYMOUS_VARIABLE(str) CONCAT(str, __LINE__)
+#define DEFER auto ANONYMOUS_VARIABLE(__guard) = detail::__scope_guard() + [&]()
+
+#define Kilobytes(num) size_t(num*1024)
+#define Megabytes(num) size_t(num*1024*1024)
+#define Gigabytes(num) size_t(num*1024*1024*1024)
+
+

@@ -1,45 +1,86 @@
-#include <iostream>
-#include <cstddef>
-#include <assert.h>
-#include <cstring>
-#include <stdlib.h>
-#include <string>
 
-#include "fallback_allocator.hpp"
-#include "mallocator.hpp"
-#include "stack_allocator.hpp"
-#include "freelist_allocator.hpp"
-#include "utils.hpp"
-#include "scope_guards.hpp"
+#include "memory.hpp"
 
+#include "allocators/general_allocator.hpp"
+#include "allocators/arena_allocator.hpp"
+#include "allocators/fallback_allocator.hpp"
+#include "allocators/malloc_allocator.hpp"
+#include "allocators/segregator_allocator.hpp"
+#include "allocators/stack_allocator.hpp"
+#include "allocators/cascade_allocator.hpp"
+#include "allocators/linear_allocator.hpp"
+#include "allocators/tracking_allocator.hpp"
+#include "allocators/bump_allocator.hpp"
 
-class Name
+struct Name
 {
-private:
-  int one_int;
-  std::string name;
-public:
-  Name(std::string name):name(name)
-    {
-      std::cout << "New!" << "\n";
-    };
-  ~Name()
-    {
-      std::cout << "Bye!" << "\n";
-    }
-};
+    int a;
+    float b;
+    unsigned c;
 
-using Allocator = saloc::FreelistAllocator<saloc::Mallocator<>, 8, 10>;
+};
 
 int main()
 {
-  Allocator aloc(10);
-  saloc::Blk blk = aloc.allocate(sizeof(Name));
-  {
-    Name *p = new (blk.ptr) Name("sad");
-    SCOPE_EXIT(p->~Name();aloc.deallocate(blk)); 
-  }
+    g_Memory.init_memory(Megabytes(1), Megabytes(128));
+    
+    using ArenaAllocator = FixedArenaAllocator<Mallocator, sizeof(Block), 58>;
+    using BlockAllocator = CascadeAllocator<ArenaAllocator, FallbackAllocator<LinearAllocator<Mallocator, 512*2>, Mallocator>>;
 
-  return 0;
+    using LargeAllocator = GeneralAllocator<BlockAllocator, BumpAllocator, Megabytes(64)>;
+    using SmallAllocator = FallbackAllocator<LinearAllocator<Mallocator, 512*2>, Mallocator>;
+    using General = Segregator<256, SmallAllocator, LargeAllocator>;    
+    
+    General allocator;
+    
+
+    DEFER {
+        allocator.destroy();
+        g_Memory.destroy();
+    };
+
+    for (size_t i = 0; i < 10; ++i) {
+        [[maybe_unused]]auto blk = allocate_type<Name>(allocator, 40);
+        // deallocate_type(allocator, blk);
+    }
+    
+
+    
+    auto blk1 = allocate_type<int>(allocator);
+    auto blk2 = allocate_type<float>(allocator);
+    auto blk3 = allocate_type<Name>(allocator);
+    *blk1 = 42;
+    std::cout << *blk1 << "\n";
+
+    blk3->a = 43;
+    blk3->b = 43.32;
+    std::cout << blk3->a << "\n";
+    std::cout << blk3->b << "\n";
+
+
+    deallocate_type(allocator, blk2);
+    deallocate_type(allocator, blk3);
+    deallocate_type(allocator, blk1);
+
+
+    
+    blk1 = allocate_type<int>(allocator);
+    blk2 = allocate_type<float>(allocator);
+    blk3 = allocate_type<Name>(allocator);
+
+    *blk1 = 44;
+    std::cout << *blk1 << "\n";
+
+    blk3->a = 44;
+    blk3->b = 44.32;
+    std::cout << blk3->a << "\n";
+    std::cout << blk3->b << "\n";
+
+
+    deallocate_type(allocator, blk2);
+    deallocate_type(allocator, blk3);
+    deallocate_type(allocator, blk1);
+
+    return 0;
 
 }
