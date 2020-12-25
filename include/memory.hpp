@@ -24,12 +24,15 @@ inline MemoryBlock g_NullBlock{0};
 
 struct BaseAllocator
 {
-    virtual MemoryBlock allocate(size_t t_size);
-    virtual void dallocate(MemoryBlock t_block);
-    virtual MemoryBlock allocate_aligned(size_t t_size, size_t t_alignment);
-    virtual void dallocate_aligned(MemoryBlock t_block);
 
-    virtual ~BaseAllocator();
+    virtual MemoryBlock allocate(size_t t_size) = 0;
+    virtual void deallocate(MemoryBlock t_block) = 0;
+    virtual MemoryBlock allocate_aligned(size_t t_size, size_t t_alignment) = 0;
+    virtual void dallocate_aligned(MemoryBlock t_block) = 0;
+    virtual void destroy() = 0;
+
+
+    virtual ~BaseAllocator(){}
 };
 
 struct MemoryState
@@ -115,6 +118,11 @@ struct TypedBlock
         return memory;
     }
 
+    T* operator+(size_t offset)
+    {
+        return memory + offset;
+    }
+
     void operator=(T* value)
     {
         memory = value;
@@ -152,6 +160,14 @@ template<typename T, typename Allocator>
 TypedBlock<T> allocate_type(Allocator& allocator, size_t count = 1)
 {
     auto res = allocator.allocate(sizeof(T)*count);
+    return {(T*)res.memory, res.size};
+    
+}
+
+template<typename T, typename Allocator>
+TypedBlock<T> allocate_type(Allocator* allocator, size_t count = 1)
+{
+    auto res = allocator->allocate(sizeof(T)*count);
     return {(T*)res.memory, res.size};
     
 }
