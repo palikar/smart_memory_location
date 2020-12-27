@@ -1,6 +1,7 @@
 #include "memory.hpp"
 #include "vector.hpp"
 #include "map.hpp"
+#include "string.hpp"
 
 #include "allocators/general_allocator.hpp"
 #include "allocators/arena_allocator.hpp"
@@ -69,25 +70,31 @@ int main()
     DEFER { allocator.destroy(); g_Memory.destroy(); };
     g_Allocator = &allocator;
 
-    Map<float> map;
+    // String name{"Stanislav Arnaudov"};
+    // name.set("Stanislav ArnaudovStanislav Arnaudov");
+    
+    
+
+    Map<String, float> map;
     map.init();
+ 
+    map.push_back("String", 42);
 
-    for (size_t i = 0; i < 30; ++i)
-    {
-        map.push_back(1 + i*32, 30.43 / (i + 1));
-    }
+    std::cout << map["String"] << "\n";
 
+    // for (size_t i = 0; i < 30; ++i)
+    // {
+    //     map.push_back(1 + i*32, 30.43 / (i + 1));
+    // }
 
-    auto it = map.first();
-    while (it) {
-        auto& [key, value] = *it;
-
-
-
-
-        
-        it = map.next(it);
-    };
+    // map.erase(1);
+    
+    // auto it = map.first();
+    // while (it) {
+    //     auto& [key, value] = *it;
+    //     std::cout << key << " : " << value << "\n";
+    //     it = map.next(it);
+    // };
 
 // Vector<int> intVec;
 // intVec.init();

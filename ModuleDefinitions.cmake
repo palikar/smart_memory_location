@@ -32,7 +32,7 @@ target_compile_features(smart_location_app
 
 
 
-add_executable(smart_containers_app src/scont.cpp)
+add_executable(smart_containers_app src/scont.cpp src/SpookyV2.cpp)
 target_include_directories(smart_containers_app PUBLIC ${INCL_DIR})
 target_include_directories(smart_containers_app PRIVATE ${INCL_DIR_PRIVATE})
 
