@@ -117,7 +117,7 @@ struct invalid
     template <>                                                     \
     struct invalid<T> {                                             \
         static int8_t is_invalid(const T& obj) noexcept {           \
-            return int8_t(std::numeric_limits<T>::max() == obj);    \
+            return std::numeric_limits<T>::max() == obj ? 1 : -1;   \
         }                                                           \
                                                                     \
         static T make_invalid() noexcept {                          \

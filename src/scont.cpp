@@ -73,29 +73,26 @@ int main()
     // String name{"Stanislav Arnaudov"};
     // name.set("Stanislav ArnaudovStanislav Arnaudov");
     
-    
-
     Map<String, float> map;
     map.init();
  
-    map.push_back("String", 42);
+    map.push_back("Stanislav", 42);
+    map.push_back("Marina", 44);
 
-    std::cout << map["String"] << "\n";
-
-    // for (size_t i = 0; i < 30; ++i)
+    // for (size_t i = 1; i < 30; ++i)
     // {
-    //     map.push_back(1 + i*32, 30.43 / (i + 1));
+    //     map.push_back(i, 1.0 * i);
     // }
 
-    // map.erase(1);
-    
-    // auto it = map.first();
-    // while (it) {
-    //     auto& [key, value] = *it;
-    //     std::cout << key << " : " << value << "\n";
-    //     it = map.next(it);
-    // };
+    auto it = map.first();
+    size_t count{0};
+    while (it) {
+        auto& [key, value] = *it;
+        std::cout << count++ << " --> " << key.data() << " : " << value << "\n";
+        it = map.next(it);
+    };
 
+    
 // Vector<int> intVec;
 // intVec.init();
         

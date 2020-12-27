@@ -28,7 +28,7 @@ struct String
 
     operator bool()
     {
-        return m_Size == 0;
+        return m_Size != 0;
     }
 
     void set_invalid()
@@ -151,6 +151,10 @@ struct hash<String> {
 template <>
 struct compare<String> {
     static int8_t cmp(const String& lhs, const String& rhs) noexcept {
+        if(lhs.m_Count != rhs.m_Count || !lhs.m_Data.memory || !rhs.m_Data.memory)
+        {
+            return -1;
+        }
         return strcmp(lhs.data(), rhs.data());
     }
 };
@@ -159,7 +163,7 @@ struct compare<String> {
 template <>
 struct invalid<String> {
     static int8_t is_invalid(const String& obj) noexcept {
-        return int8_t(std::numeric_limits<size_t>::max() == obj.m_Count);
+        return std::numeric_limits<size_t>::max() == obj.m_Count ? 1 : -1;
     }
 
     static String make_invalid() noexcept

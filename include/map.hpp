@@ -27,31 +27,33 @@ struct Map
     void init(size_t t_Size = 16)
     {
         m_Data = allocate_type<char>(g_Allocator, (t_Size + 8)*sizeof(PairType));
+        memset(m_Data.memory, 0 , m_Data.size);
         m_Count = 0;
-        m_Size = m_Data.size / sizeof(T);
+        m_Size = m_Data.size / sizeof(PairType);
     }
 
     void push_back(const Key& t_Key, const T& t_Element)
     {
         assert(m_Data.memory);
-        assert(!invalid<Key>::is_invalid(t_Key));
+        assert(invalid<Key>::is_invalid(t_Key) < 0);
 
         if (m_Count == m_Size)
         {
             grow();
         }
 
-        auto slot_index = hash<Key>::hash_value(t_Key)& m_Size;
-        auto slot_memory = (PairType*)(m_Data + slot_index*sizeof(T));
-        size_t cnt{0};
-
-        while (!slot_memory->key && compare<Key>::cmp(slot_memory->key, t_Key) == 0)
+        auto slot_index = hash<Key>::hash_value(t_Key) % m_Size;
+        auto slot_memory = (PairType*)(m_Data.memory + slot_index*sizeof(PairType));
+        while (slot_memory->key && compare<Key>::cmp(slot_memory->key, t_Key) != 0)
         {
+            
             ++slot_memory;
-            ++cnt;
+        
             if(is_passed_the_end(slot_memory))
             {
-                slot_memory = (PairType*)(m_Data + (cnt + slot_index)*sizeof(T));
+                grow();
+                push_back(t_Key, t_Element);
+                return;
             }
 
         }
@@ -64,13 +66,14 @@ struct Map
     {
         assert(m_Data.memory);
 
-        auto slot_index = hash<Key>::hash_value(t_Key)& m_Size;
-        auto slot_memory = (PairType*)(m_Data.memory + slot_index*sizeof(T));
-        while (compare<Key>::cmp(slot_memory->key,t_Key) != 0)
+        auto slot_index = hash<Key>::hash_value(t_Key) % m_Size;
+        
+        auto slot_memory = (PairType*)(m_Data.memory + slot_index*sizeof(PairType));
+        while (compare<Key>::cmp(slot_memory->key, t_Key) != 0)
         {
             ++slot_memory;
 
-            if (slot_memory->key == 0)
+            if (!slot_memory->key)
             {
                 assert(false);
             }
@@ -89,8 +92,8 @@ struct Map
 
         assert(m_Data.memory);
 
-        auto slot_index = hash<Key>::hash_value(t_Key)& m_Size;
-        auto slot_memory = (PairType*)(m_Data.memory + slot_index*sizeof(T));
+        auto slot_index = hash<Key>::hash_value(t_Key) % m_Size;
+        auto slot_memory = (PairType*)(m_Data.memory + slot_index*sizeof(PairType));
         while (compare<Key>::cmp(slot_memory->key,t_Key) != 0)
         {
             ++slot_memory;
@@ -125,8 +128,8 @@ struct Map
 
     bool erase(const Key& t_Key)
     {
-        auto slot_index = hash<Key>::hash_value(t_Key)& m_Size;
-        auto slot_memory = (PairType*)(m_Data.memory + slot_index*sizeof(T));
+        auto slot_index = hash<Key>::hash_value(t_Key) % m_Size;
+        auto slot_memory = (PairType*)(m_Data.memory + slot_index*sizeof(PairType));
         while (slot_memory->key != t_Key)
         {
             ++slot_memory;
@@ -148,7 +151,8 @@ struct Map
 
     PairType* first()
     {
-        return (PairType*)m_Data.memory;
+        return next((PairType*)m_Data.memory);
+        
     }
 
     PairType* next(PairType* t_Pair)
@@ -171,35 +175,51 @@ struct Map
 
     inline  bool is_passed_the_end(PairType* slot_memory) const
     {
-        return (char*)slot_memory >= m_Data.memory + m_Size*sizeof(PairType);
+        return (char*)slot_memory >= (m_Data.memory + m_Data.size);
     }
 
     inline static bool is_sentinel(PairType* slot_memory)
     {
-        return invalid<Key>::is_invalid(slot_memory->key);
+        return invalid<Key>::is_invalid(slot_memory->key) > 0;
     }
 
     inline static bool is_empty(PairType* slot_memory)
     {
-        return slot_memory->key == 0;
+        return !slot_memory->key;
     }
 
     
     void grow()
     {
         const auto newSize = (2*m_Size);
-        auto newBlock = allocate_type<char>(g_Allocator, newSize*sizeof(T));
-        m_Size = newBlock.size / sizeof(T);
-        memcpy(newBlock.memory, m_Data.memory, m_Data.size);
+
+        auto newBlock = allocate_type<char>(g_Allocator, newSize*sizeof(PairType));
+        m_Size = newBlock.size / sizeof(PairType);
+        auto oldBlock = m_Data;
         m_Data = newBlock;
+
+        
+        auto pair = (PairType*)oldBlock.memory;
+        do {
+            while(is_sentinel(pair) || is_empty(pair))
+            {
+                ++pair;
+            }
+        
+            push_back(pair->key, pair->value);
+            ++pair;
+            
+        } while((char*)pair < oldBlock.memory + oldBlock.size);
+
+        deallocate_type(*g_Allocator, oldBlock);
     }
 
     void shrink()
     {
         const auto newSize = (m_Size/2);
-        auto newBlock = allocate_type<char>(g_Allocator, newSize*sizeof(T));
-        m_Size = newBlock.size / sizeof(T);
-        memcpy(newBlock.memory, m_Data.memory, m_Count*sizeof(T));
+        auto newBlock = allocate_type<char>(g_Allocator, newSize*sizeof(PairType));
+        m_Size = newBlock.size / sizeof(PairType);
+        memcpy(newBlock.memory, m_Data.memory, m_Count*sizeof(PairType));
         m_Data = newBlock;
     }
 
