@@ -1,4 +1,6 @@
 #include "memory.hpp"
+#include "vector.hpp"
+#include "map.hpp"
 
 #include "allocators/general_allocator.hpp"
 #include "allocators/arena_allocator.hpp"
@@ -18,7 +20,7 @@ using SmallAllocator = FallbackAllocator<LinearAllocator<Mallocator, 512*2>, Mal
 using GeneralType = Segregator<256, SmallAllocator, LargeAllocator>;    
 
 template<typename Allocator>
-struct TypedAllocator : BaseAllocator
+struct WrappedAllocator : BaseAllocator
 {
     Allocator m_Allocator;
 
@@ -48,7 +50,7 @@ struct TypedAllocator : BaseAllocator
     
 };
 
-using MainAllocator = TypedAllocator<GeneralType>;
+using MainAllocator = WrappedAllocator<GeneralType>;
 
 
 struct Name
@@ -67,17 +69,43 @@ int main()
     DEFER { allocator.destroy(); g_Memory.destroy(); };
     g_Allocator = &allocator;
 
-    Vector intVec;
-    intVec.init();
+    Map<float> map;
+    map.init();
+
+    for (size_t i = 0; i < 30; ++i)
+    {
+        map.push_back(1 + i*32, 30.43 / (i + 1));
+    }
+
+
+    auto it = map.first();
+    while (it) {
+        auto& [key, value] = *it;
+
+
+
 
         
-    std::cout << "count: " << intVec.count() << "\n";
-    std::cout << "size: " << intVec.m_Size << "\n";
+        it = map.next(it);
+    };
+
+// Vector<int> intVec;
+// intVec.init();
+        
+// for (size_t i = 0; i < 34; ++i)
+// {
+//     intVec.push_back(i);
+// }
+
+// intVec.erase(2);
+// intVec.erase(intVec.data() + 2);
+
+// for (size_t i = 0; i < intVec.count(); ++i)
+// {
+//     std::cout << intVec[i] << "\n";
+// }
     
-    for (size_t i = 0; i < intVec.count(); ++i)
-    {
-        std::cout << intVec[i] << "\n";
-    }
+
     
 
 
