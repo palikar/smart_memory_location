@@ -34,52 +34,53 @@ int main()
     General allocator;
     
 
-    DEFER {
-        allocator.destroy();
-        g_Memory.destroy();
-    };
+    // DEFER {
+    //     allocator.destroy();
+    //     g_Memory.destroy();
+    // };
 
-    for (size_t i = 0; i < 10; ++i) {
-        [[maybe_unused]]auto blk = allocate_type<Name>(allocator, 40);
-        // deallocate_type(allocator, blk);
-    }
+    // for (size_t i = 0; i < 10; ++i) {
+    //     [[maybe_unused]]auto blk = allocate_type<Name>(allocator, 40);
+    //     // deallocate_type(allocator, blk);
+    // }
     
+    // auto blk1 = allocate_type<int>(allocator);
+    // auto blk2 = allocate_type<float>(allocator);
+    // auto blk3 = allocate_type<Name>(allocator);
+    // *blk1 = 42;
+    // std::cout << *blk1 << "\n";
 
-    
-    auto blk1 = allocate_type<int>(allocator);
-    auto blk2 = allocate_type<float>(allocator);
-    auto blk3 = allocate_type<Name>(allocator);
-    *blk1 = 42;
-    std::cout << *blk1 << "\n";
-
-    blk3->a = 43;
-    blk3->b = 43.32;
-    std::cout << blk3->a << "\n";
-    std::cout << blk3->b << "\n";
+    // blk3->a = 43;
+    // blk3->b = 43.32;
+    // std::cout << blk3->a << "\n";
+    // std::cout << blk3->b << "\n";
 
 
-    deallocate_type(allocator, blk2);
-    deallocate_type(allocator, blk3);
-    deallocate_type(allocator, blk1);
+    // deallocate_type(allocator, blk2);
+    // deallocate_type(allocator, blk3);
+    // deallocate_type(allocator, blk1);
 
 
     
-    blk1 = allocate_type<int>(allocator);
-    blk2 = allocate_type<float>(allocator);
-    blk3 = allocate_type<Name>(allocator);
+    // blk1 = allocate_type<int>(allocator);
+    // blk2 = allocate_type<float>(allocator);
+    // blk3 = allocate_type<Name>(allocator);
 
-    *blk1 = 44;
-    std::cout << *blk1 << "\n";
+    // *blk1 = 44;
+    // std::cout << *blk1 << "\n";
 
-    blk3->a = 44;
-    blk3->b = 44.32;
-    std::cout << blk3->a << "\n";
-    std::cout << blk3->b << "\n";
+    // blk3->a = 44;
+    // blk3->b = 44.32;
+    // std::cout << blk3->a << "\n";
+    // std::cout << blk3->b << "\n";
 
 
-    deallocate_type(allocator, blk2);
-    deallocate_type(allocator, blk3);
-    deallocate_type(allocator, blk1);
+    // deallocate_type(allocator, blk2);
+    // deallocate_type(allocator, blk3);
+    // deallocate_type(allocator, blk1);
+
+
+    
 
     return 0;
 

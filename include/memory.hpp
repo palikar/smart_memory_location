@@ -167,6 +167,13 @@ void deallocate_type(Allocator& allocator, TypedBlock<T> block)
     allocator.deallocate({(char*)block.memory, block.size});
 }
 
+template< typename Allocator, typename T>
+void deallocate_type(Allocator* allocator, TypedBlock<T> block)
+{
+    allocator->deallocate({(char*)block.memory, block.size});
+}
+
+
 inline MemoryState g_Memory;
 inline BaseAllocator* g_Allocator;
 

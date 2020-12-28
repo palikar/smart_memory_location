@@ -172,4 +172,3 @@ ASL_VALID_INT(long);
 ASL_VALID_INT(long long);
 ASL_VALID_INT(unsigned long);
 ASL_VALID_INT(unsigned long long);
-
