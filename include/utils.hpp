@@ -1,9 +1,10 @@
 #pragma once
-#include <iostream>
-#include <cstddef>
-#include <assert.h>
+#include <limits>
+#include <cctype>
+#include <cstdint>
 #include <cstring>
-#include <stdlib.h>
+#include <new>
+#include <cassert>
 
 namespace detail
 {

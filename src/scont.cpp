@@ -1,7 +1,10 @@
+#include <iostream>
+
 #include "memory.hpp"
-#include "vector.hpp"
-#include "map.hpp"
-#include "string.hpp"
+
+#include "containers/vector.hpp"
+#include "containers/map.hpp"
+#include "containers/string.hpp"
 
 #include "allocators/general_allocator.hpp"
 #include "allocators/arena_allocator.hpp"
@@ -70,22 +73,37 @@ int main()
     DEFER { allocator.destroy(); g_Memory.destroy(); };
     g_Allocator = &allocator;
 
-    // String name{"Stanislav Arnaudov"};
-    // name.set("Stanislav ArnaudovStanislav Arnaudov");
-    
+
     Map<String, float> map;
     map.init();
  
     map.push_back("Stanislav", 42);
     map.push_back("Marina", 44);
+    map.push_back("Marina_1", 44);
+    map.push_back("Marina_2", 445);
+    map.push_back("Marina_3", 446);
+    map.push_back("Marina_4", 447);
+    map.push_back("Marina_5", 448);
+    map.push_back("Marina_6", 449);
+    map.push_back("Marina_7", 4410);
+    map.push_back("Marina_8", 4411);
 
-    // for (size_t i = 1; i < 30; ++i)
-    // {
-    //     map.push_back(i, 1.0 * i);
-    // }
+
+    std::cout << map["Stanislav"] << '\n';
+    std::cout << map["Marina"] << '\n';
+    std::cout << map["Marina_1"] << '\n';
+    std::cout << map["Marina_2"] << '\n';
+    std::cout << map["Marina_3"] << '\n';
+    std::cout << map["Marina_4"] << '\n';
+    std::cout << map["Marina_5"] << '\n';
+    std::cout << map["Marina_6"] << '\n';
+    std::cout << map["Marina_7"] << '\n';
+    std::cout << map["Marina_8"] << '\n';
+
+    
 
     auto it = map.first();
-    size_t count{0};
+    size_t count{1};
     while (it) {
         auto& [key, value] = *it;
         std::cout << count++ << " --> " << key.data() << " : " << value << "\n";
@@ -93,27 +111,21 @@ int main()
     };
 
     
-// Vector<int> intVec;
-// intVec.init();
-        
-// for (size_t i = 0; i < 34; ++i)
-// {
-//     intVec.push_back(i);
-// }
+	// Vector<int> intVec;
+	// intVec.init();
+	        
+	// for (size_t i = 0; i < 34; ++i)
+	// {
+	//     intVec.push_back(i);
+	// }
+	
+	// intVec.erase(2);
+	// intVec.erase(intVec.data() + 2);
+	
+	// for (size_t i = 0; i < intVec.count(); ++i)
+	// {
+	//     std::cout << intVec[i] << "\n";
+	// }
 
-// intVec.erase(2);
-// intVec.erase(intVec.data() + 2);
-
-// for (size_t i = 0; i < intVec.count(); ++i)
-// {
-//     std::cout << intVec[i] << "\n";
-// }
-    
-
-    
-
-
-
-    
     return 0;
 }

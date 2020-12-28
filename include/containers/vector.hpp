@@ -43,6 +43,21 @@ struct Vector
         ++m_Count;
     }
 
+    void resize(size_t t_Size)
+    {
+        
+        if (t_Size < m_Size)
+        {
+            const auto newSize = t_Size;
+            auto newBlock = allocate_type<char>(g_Allocator, newSize*sizeof(T));
+            m_Size = newBlock.size / sizeof(T);
+            memcpy(newBlock.memory, m_Data.memory, m_Data.size);
+            m_Data = newBlock;
+        }
+        
+        m_Count = t_Size;
+    }
+
     inline T& operator[](size_t t_Index) const
     {
         assert(m_Data.memory);

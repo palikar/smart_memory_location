@@ -151,8 +151,13 @@ struct Map
 
     PairType* first()
     {
-        return next((PairType*)m_Data.memory);
-        
+        auto firstPair = (PairType*)m_Data.memory;
+        if(is_sentinel(firstPair) || is_empty(firstPair))
+        {
+            return next(firstPair);
+        }
+        return firstPair;
+
     }
 
     PairType* next(PairType* t_Pair)

@@ -2,7 +2,7 @@
 
 #include "memory.hpp"
 #include "utils.hpp"
-#include "SpookyV2.h"
+#include "lib/SpookyV2.h"
 
 struct String
 {

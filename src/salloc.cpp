@@ -1,6 +1,6 @@
+#include <iostream>
 
 #include "memory.hpp"
-
 #include "allocators/general_allocator.hpp"
 #include "allocators/arena_allocator.hpp"
 #include "allocators/fallback_allocator.hpp"
