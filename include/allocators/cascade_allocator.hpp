@@ -21,6 +21,7 @@ struct CascadeAllocator : private Primary
 
     MemoryBlock allocate(size_t t_Size)
     {
+
         if(!m_Allocators)
         {
             m_Allocators = allocate_type<BlockType, Primary>(*static_cast<Primary*>(this));

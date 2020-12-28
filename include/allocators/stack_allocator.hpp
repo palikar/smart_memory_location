@@ -16,7 +16,7 @@ struct StackAllocator
     MemoryBlock allocate(size_t t_Size)
     {
         size_t  n1 = roundToAlign(t_Size);
-        if ((m_Stack + N) - m_Pos <  n1)
+        if ((size_t)((m_Stack + N) - m_Pos) <  n1)
         {
             return {nullptr, 0};
         }
@@ -38,5 +38,10 @@ struct StackAllocator
     {
         return t_Blockk.memory >= m_Stack && t_Blockk.memory < m_Stack + N;
     }
+
+    void destroy()
+    {}    
+
+    
 };
 

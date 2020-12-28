@@ -21,39 +21,7 @@ using ArenaAllocator = FixedArenaAllocator<Mallocator, sizeof(Block), 58>;
 using BlockAllocator = CascadeAllocator<ArenaAllocator, FallbackAllocator<LinearAllocator<Mallocator, 512*2>, Mallocator>>;
 using LargeAllocator = GeneralAllocator<BlockAllocator, BumpAllocator, Megabytes(64)>;
 using SmallAllocator = FallbackAllocator<LinearAllocator<Mallocator, 512*2>, Mallocator>;
-using GeneralType = Segregator<256, SmallAllocator, LargeAllocator>;    
-
-template<typename Allocator>
-struct WrappedAllocator : BaseAllocator
-{
-    Allocator m_Allocator;
-
-    MemoryBlock allocate(size_t t_Size) override
-    {
-        return m_Allocator.allocate(t_Size);
-    }
-    
-    void deallocate(MemoryBlock t_Block) override
-    {
-        m_Allocator.deallocate(t_Block);
-    }
-    
-    MemoryBlock allocate_aligned(size_t, size_t) override
-    {
-        return {};
-    }
-    
-    void dallocate_aligned(MemoryBlock) override
-    {
-    }
-
-    void destroy() override
-    {
-        m_Allocator.destroy();
-    }
-    
-};
-
+using GeneralType = Segregator<256, SmallAllocator, LargeAllocator>;
 using MainAllocator = WrappedAllocator<GeneralType>;
 
 

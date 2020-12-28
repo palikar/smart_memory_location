@@ -13,8 +13,11 @@ struct FallbackAllocator
     MemoryBlock allocate(std::size_t size)
     {
         MemoryBlock ptr = m_Primary.allocate(size);
+        
         if (!ptr.memory)
+        {
             ptr = m_Fallback.allocate(size);
+        }
         return ptr;
     }
     

@@ -9,7 +9,7 @@ class Mallocator
   public:    
     MemoryBlock allocate(std::size_t n)
     {
-        
+
         return {(char*)malloc(n), n};
     }
 

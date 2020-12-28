@@ -102,13 +102,17 @@ find_package(Threads REQUIRED)
 
 target_include_directories(project_options INTERFACE include)
 
-
 add_executable(asl_alloc ./src/salloc.cpp)
 target_link_libraries(asl_alloc
     PUBLIC project_options project_warnings project_defines)
 
 add_executable(asl_containers ./src/scont.cpp)
 target_link_libraries(asl_containers
+    PUBLIC project_options project_warnings project_defines spooky_hash)
+
+
+add_executable(asl_talloc ./src/talloc.cpp)
+target_link_libraries(asl_talloc
     PUBLIC project_options project_warnings project_defines spooky_hash)
 
 
