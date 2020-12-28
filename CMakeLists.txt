@@ -95,6 +95,8 @@ target_compile_definitions(project_defines INTERFACE AY_VERSION_MAJOR=1)
 target_compile_definitions(project_defines INTERFACE AY_VERSION_MINOR=0)
 target_compile_definitions(project_defines INTERFACE AY_VERSION_PATCH=0)
 
+add_subdirectory(lib)
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
@@ -105,9 +107,9 @@ add_executable(asl_alloc ./src/salloc.cpp)
 target_link_libraries(asl_alloc
     PUBLIC project_options project_warnings project_defines)
 
-add_executable(asl_containers ./src/scont.cpp src/SpookyV2.cpp)
+add_executable(asl_containers ./src/scont.cpp)
 target_link_libraries(asl_containers
-    PUBLIC project_options project_warnings project_defines)
+    PUBLIC project_options project_warnings project_defines spooky_hash)
 
 
 option(ENABLE_TESTING "Enablel tsting" FALSE)

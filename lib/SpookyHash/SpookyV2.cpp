@@ -13,7 +13,7 @@
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 
 #include <memory.h>
-#include "lib/SpookyV2.h"
+#include "SpookyV2.h"
 
 #define ALLOW_UNALIGNED_READS 1
 
