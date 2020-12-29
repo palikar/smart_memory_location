@@ -4,6 +4,8 @@
 #include "utils.hpp"
 #include "SpookyV2.h"
 
+#include <cstring>
+
 struct String
 {
     using BlockType = TypedBlock<char>;
@@ -16,6 +18,14 @@ struct String
     {
      
     }
+
+    void init(size_t t_Size) 
+    {
+        m_Data = allocate_type<char>(g_Allocator, t_Size*sizeof(char));
+        m_Size = m_Data.size;
+        m_Count = 0;
+    }
+
 
     String(const char* buf)
     {
@@ -56,6 +66,17 @@ struct String
         }
         *(m_Data + m_Count) = t_Element;
         ++m_Count;
+    }
+
+    void append(char* t_Contents, size_t t_Size)
+    {
+        assert(m_Data.memory);
+        if (m_Count == m_Size)
+        {
+            grow((size_t)m_Size*1.5);
+        }
+        memcpy(m_Data + m_Count, t_Contents, t_Size);
+        m_Count += t_Size;
     }
 
     inline char operator[](size_t t_Index) const

@@ -2,6 +2,8 @@
 
 #include "memory.hpp"
 
+#include <algorithm>
+#include <iostream>
 
 // @Note(Stan): we can optionally add tags here
 template<typename Primary>

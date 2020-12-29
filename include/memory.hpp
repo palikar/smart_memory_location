@@ -3,6 +3,7 @@
 #include "utils.hpp"
 #include <sys/mman.h>
 
+
 struct MemoryBlock
 {
     char* memory{nullptr};
@@ -236,3 +237,15 @@ struct WrappedAllocator : BaseAllocator
 inline MemoryState g_Memory;
 inline BaseAllocator* g_Allocator;
 inline BaseAllocator* g_TempAllocator;
+
+
+#include "allocators/general_allocator.hpp"
+#include "allocators/arena_allocator.hpp"
+#include "allocators/fallback_allocator.hpp"
+#include "allocators/malloc_allocator.hpp"
+#include "allocators/segregator_allocator.hpp"
+#include "allocators/stack_allocator.hpp"
+#include "allocators/cascade_allocator.hpp"
+#include "allocators/linear_allocator.hpp"
+#include "allocators/tracking_allocator.hpp"
+#include "allocators/bump_allocator.hpp"

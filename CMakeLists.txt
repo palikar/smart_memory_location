@@ -116,6 +116,11 @@ target_link_libraries(asl_talloc
     PUBLIC project_options project_warnings project_defines spooky_hash)
 
 
+add_executable(asl_splat ./src/splat.cpp)
+target_link_libraries(asl_splat
+    PUBLIC project_options project_warnings project_defines spooky_hash)
+
+
 option(ENABLE_TESTING "Enablel tsting" FALSE)
 if(${ENABLE_TESTING})
     enable_testing()

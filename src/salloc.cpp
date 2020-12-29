@@ -28,7 +28,7 @@ int main()
     using BlockAllocator = CascadeAllocator<ArenaAllocator, FallbackAllocator<LinearAllocator<Mallocator, 512*2>, Mallocator>>;
 
     using LargeAllocator = GeneralAllocator<BlockAllocator, BumpAllocator, Megabytes(64)>;
-    using SmallAllocator = FallbackAllocator<LinearAllocator<Mallocator, 512*2>, Mallocator>;
+    using SmallAllocator = FallbackAllocator<GeneralAllocator<BlockAllocator, Mallocator, Megabytes(4)>, Mallocator>;
     using General = Segregator<256, SmallAllocator, LargeAllocator>;    
     
     General allocator;

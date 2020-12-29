@@ -27,7 +27,7 @@ struct Vector
         {
             grow();
         }
-        *(m_Data + m_Count*sizeof(T)) = t_Element;
+        *(T*)(m_Data + m_Count*sizeof(T)) = t_Element;
         ++m_Count;
     }
 
