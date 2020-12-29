@@ -28,7 +28,8 @@ struct FileHandle
 enum class FileMode
 {
     Read,
-    Write
+    Write,
+    WriteAppend
 };
 
 struct Platform
@@ -68,9 +69,14 @@ struct Platform
         if (t_Mode == FileMode::Read)
         {
             fd = open(t_FileName, O_RDONLY, S_IRUSR | S_IWUSR);
-        } else if (t_Mode == FileMode::Write)
+        }
+        else if (t_Mode == FileMode::Write)
         {
             fd = open(t_FileName, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+        }
+        else if (t_Mode == FileMode::WriteAppend)
+        {
+            fd = open(t_FileName, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
         }
         
         return {fd};
@@ -95,6 +101,49 @@ struct Platform
 
         return fileContents;
 
+    }
+
+    static ByteBlock readWholeFileBinary(FileHandle t_Fd)
+    {
+        struct stat statBuf;
+        fstat(t_Fd.fd, &statBuf);
+        const auto fileSize =  statBuf.st_size;
+
+        ByteBlock fileContents = allocate_type<char>(g_Allocator, fileSize);
+        size_t currentOffset = 0;
+
+        // @Note(Stan) : This can probably be empirically optimized
+        char buf[Kilobytes(1)];
+        ssize_t readBytes;
+        while ((readBytes = read(t_Fd.fd, buf, Kilobytes(1))) > 0)
+        {
+            memcpy(fileContents.memory + currentOffset, buf, (size_t)readBytes);
+            currentOffset += (size_t)readBytes;
+        }
+
+        return fileContents;
+
+    }
+
+    static void writeToFile(FileHandle t_Fd, char* t_Buffer, size_t t_Size)
+    {
+        write(t_Fd.fd, t_Buffer, t_Size);
+    }
+
+    static void writeToFile(FileHandle t_Fd, String t_String)
+    {
+        write(t_Fd.fd, t_String.data(), t_String.count());
+    }
+
+    static void writeToFile(FileHandle t_Fd, std::string_view t_String)
+    {
+        write(t_Fd.fd, t_String.data(), t_String.size());
+    }
+    
+    template<typename T>
+    static void writeToFile(FileHandle t_Fd, const T& t_Value)
+    {
+        write(t_Fd.fd, &t_Value, sizeof(t_Value));
     }
 
     static void closeFile(FileHandle t_Fd)

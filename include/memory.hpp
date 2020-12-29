@@ -165,6 +165,8 @@ struct TypedBlock
 
 };
 
+using ByteBlock = TypedBlock<char>;
+
 
 inline size_t roundToAlign(size_t t_size)
 {

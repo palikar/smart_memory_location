@@ -174,3 +174,18 @@ ASL_VALID_INT(long);
 ASL_VALID_INT(long long);
 ASL_VALID_INT(unsigned long);
 ASL_VALID_INT(unsigned long long);
+
+
+struct BlobReader
+{
+    char* m_Buffer;
+
+    template<typename T>
+    T readType()
+    {
+        const auto value = *(T*)m_Buffer;
+        m_Buffer += sizeof(T);
+        return value;
+    }
+
+};
