@@ -1,29 +1,11 @@
 #include <iostream>
 
 #include "memory.hpp"
+#include "allocators.hpp"
 
 #include "containers/vector.hpp"
 #include "containers/map.hpp"
 #include "containers/string.hpp"
-
-#include "allocators/general_allocator.hpp"
-#include "allocators/arena_allocator.hpp"
-#include "allocators/fallback_allocator.hpp"
-#include "allocators/malloc_allocator.hpp"
-#include "allocators/segregator_allocator.hpp"
-#include "allocators/stack_allocator.hpp"
-#include "allocators/cascade_allocator.hpp"
-#include "allocators/linear_allocator.hpp"
-#include "allocators/tracking_allocator.hpp"
-#include "allocators/bump_allocator.hpp"
-
-using ArenaAllocator = FixedArenaAllocator<Mallocator, sizeof(Block), 58>;
-using BlockAllocator = CascadeAllocator<ArenaAllocator, FallbackAllocator<LinearAllocator<Mallocator, 512*2>, Mallocator>>;
-using LargeAllocator = GeneralAllocator<BlockAllocator, BumpAllocator, Megabytes(64)>;
-using SmallAllocator = FallbackAllocator<LinearAllocator<Mallocator, 512*2>, Mallocator>;
-using GeneralType = Segregator<256, SmallAllocator, LargeAllocator>;
-using MainAllocator = WrappedAllocator<GeneralType>;
-
 
 struct Name
 {
@@ -36,12 +18,12 @@ struct Name
 
 int main()
 {
-    g_Memory.init_memory(Megabytes(1), Megabytes(128));
-    MainAllocator allocator;
-    DEFER { allocator.destroy(); g_Memory.destroy(); };
-    g_Allocator = &allocator;
-
-
+    MainAllocator globalAllocator;
+    TempAllocator tempAllocator;
+    Memory::init_memory(Megabytes(1), Megabytes(128));
+    Memory::init_allocators(&globalAllocator, &tempAllocator);
+    DEFER { Memory::destroy();};
+    
     Map<String, float> map;
     map.init();
  
@@ -56,7 +38,8 @@ int main()
     map.push_back("Marina_7", 4410);
     map.push_back("Marina_8", 4411);
 
-
+    std::cout << "............" << "\n";
+    
     std::cout << map["Stanislav"] << '\n';
     std::cout << map["Marina"] << '\n';
     std::cout << map["Marina_1"] << '\n';
@@ -70,13 +53,13 @@ int main()
 
     
 
-    auto it = map.first();
-    size_t count{1};
-    while (it) {
-        auto& [key, value] = *it;
-        std::cout << count++ << " --> " << key.data() << " : " << value << "\n";
-        it = map.next(it);
-    };
+    // auto it = map.first();
+    // size_t count{1};
+    // while (it) {
+    //     auto& [key, value] = *it;
+    //     std::cout << count++ << " --> " << key.data() << " : " << value << "\n";
+    //     it = map.next(it);
+    // };
 
     
 	// Vector<int> intVec;

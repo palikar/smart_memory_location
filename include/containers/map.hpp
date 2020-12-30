@@ -30,6 +30,8 @@ struct Map
         memset(m_Data.memory, 0 , m_Data.size);
         m_Count = 0;
         m_Size = m_Data.size / sizeof(PairType);
+
+
     }
 
     void push_back(const Key& t_Key, const T& t_Element)
@@ -44,6 +46,7 @@ struct Map
 
         auto slot_index = hash<Key>::hash_value(t_Key) % m_Size;
         auto slot_memory = (PairType*)(m_Data.memory + slot_index*sizeof(PairType));
+
         while (slot_memory->key && compare<Key>::cmp(slot_memory->key, t_Key) != 0)
         {
             
@@ -67,8 +70,11 @@ struct Map
         assert(m_Data.memory);
 
         auto slot_index = hash<Key>::hash_value(t_Key) % m_Size;
-        
         auto slot_memory = (PairType*)(m_Data.memory + slot_index*sizeof(PairType));
+
+
+        std::cout << slot_memory->key.data() << "\n";
+         
         while (compare<Key>::cmp(slot_memory->key, t_Key) != 0)
         {
             ++slot_memory;
@@ -203,14 +209,13 @@ struct Map
         auto oldBlock = m_Data;
         m_Data = newBlock;
 
-        
         auto pair = (PairType*)oldBlock.memory;
         do {
             while(is_sentinel(pair) || is_empty(pair))
             {
                 ++pair;
             }
-        
+
             push_back(pair->key, pair->value);
             ++pair;
             

@@ -6,6 +6,10 @@
 #include <new>
 #include <cassert>
 
+// Note(Stan) : Clean up this
+#include <iostream>
+
+#include <type_traits>
 
 
 namespace detail
@@ -189,3 +193,40 @@ struct BlobReader
     }
 
 };
+
+
+template<typename First, typename Second>
+struct Pair
+{
+    First first{0};
+    Second second{0};
+};
+
+
+template<typename T1, typename T2, typename T = std::common_type_t<T1, T2>>
+T max(const T1& t_Element1, const T2& t_Element2)
+{
+    
+    return compare<T>::cmp(t_Element1, t_Element2) > 0 ? t_Element1 : t_Element2;
+}
+
+
+template<typename T1, typename ... Ts>
+auto max(const T1& t_Element1, const Ts& ... t_Elements)
+{
+    return max(t_Element1, max(t_Elements ...));
+}
+
+template<typename T1, typename T2, typename T = std::common_type_t<T1, T2>>
+T min(const T1& t_Element1, const T2& t_Element2)
+{
+    
+    return compare<T>::cmp(t_Element1, t_Element2) <= 0 ? t_Element1 : t_Element2;
+}
+
+template<typename T1, typename ... Ts>
+auto min(const T1& t_Element1, const Ts& ... t_Elements)
+{
+    return min(t_Element1, min(t_Elements ...));
+}
+

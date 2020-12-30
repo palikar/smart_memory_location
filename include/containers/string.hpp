@@ -26,10 +26,9 @@ struct String
         m_Count = 0;
     }
 
-
     String(const char* buf)
     {
-        auto size = std::strlen(buf);
+        auto size = std::strlen(buf)+1;
         m_Data = allocate_type<char>(g_Allocator, size);
         m_Count = size;
         strcpy(m_Data.memory, buf);
@@ -135,6 +134,11 @@ struct String
     bool empty()
     {
         return m_Count == 0;
+    }
+
+    void destory()
+    {
+        deallocate_type(g_Allocator, m_Data);
     }
     
 

@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <unistd.h>
-
+#include <string_view>
 
 #include "containers/vector.hpp"
 #include "containers/string.hpp"

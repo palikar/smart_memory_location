@@ -36,89 +36,6 @@ struct MemoryState
 
     uint8_t* current_bulk_offset{nullptr};
     uint8_t* current_temp_offset{nullptr};
-
-    void init_memory(size_t temp_size, size_t bulk_size)
-    {
-        // Todo(Stan): Add error checking here!
-        temp_memory = temp_size;
-        bulk_memory = bulk_size;
-
-        const size_t total_size = temp_memory + bulk_memory;
-
-        temp = mmap ( NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
-        if (!temp) {
-            assert(false);
-        }
-        bulk = (uint8_t*)temp + temp_memory;
-
-        current_bulk_offset = (uint8_t*)bulk;
-        current_temp_offset = (uint8_t*)temp;
-        
-        memset(temp, 0, total_size);
-
-    }
-
-    void destroy()
-    {
-        munmap(temp, temp_memory + bulk_memory);
-    }
-
-    char* push_size(size_t t_size)
-    {
-        auto res = (char*)current_bulk_offset;
-        memset(res, 0, t_size);
-        current_bulk_offset += t_size;
-        return res;
-    }
-
-    template<typename T>
-    T* push_type()
-    {
-        auto res = (T*)current_bulk_offset;
-        memset(res, 0, sizeof(T));
-        current_bulk_offset += sizeof(T);
-        return res;
-    }
-
-    template<typename T>
-    T* push_array(size_t t_count)
-    {
-        auto res = (T*)current_bulk_offset;
-        memset(res, 0, sizeof(T)*t_count);
-        current_bulk_offset += sizeof(T)*t_count;
-        return res;
-    }
-
-    char* push_size_temp(size_t t_size)
-    {
-        auto res = (char*)current_temp_offset;
-        current_temp_offset += t_size;
-        return res;
-    }
-
-    template<typename T>
-    T* push_type_temp()
-    {
-        auto res = (T*)current_temp_offset;
-        memset(res, 0, sizeof(T));
-        current_temp_offset += sizeof(T);
-        return res;
-    }
-
-    template<typename T>
-    T* push_array_temp(size_t t_count)
-    {
-        auto res = (T*)current_temp_offset;
-        memset(res, 0, sizeof(T)*t_count);
-        current_temp_offset += sizeof(T)*t_count;
-        return res;
-    }
-
-    void reset_temp()
-    {
-        current_temp_offset = (uint8_t*)temp;
-    }
-
 };
 
 template<typename T>
@@ -240,14 +157,98 @@ inline MemoryState g_Memory;
 inline BaseAllocator* g_Allocator;
 inline BaseAllocator* g_TempAllocator;
 
+struct Memory
+{
 
-#include "allocators/general_allocator.hpp"
-#include "allocators/arena_allocator.hpp"
-#include "allocators/fallback_allocator.hpp"
-#include "allocators/malloc_allocator.hpp"
-#include "allocators/segregator_allocator.hpp"
-#include "allocators/stack_allocator.hpp"
-#include "allocators/cascade_allocator.hpp"
-#include "allocators/linear_allocator.hpp"
-#include "allocators/tracking_allocator.hpp"
-#include "allocators/bump_allocator.hpp"
+    static void init_memory(size_t temp_size, size_t bulk_size)
+    {
+        // Todo(Stan): Add error checking here!
+        g_Memory.temp_memory = temp_size;
+        g_Memory.bulk_memory = bulk_size;
+
+        const size_t total_size = g_Memory.temp_memory + g_Memory.bulk_memory;
+
+        g_Memory.temp = mmap ( NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
+        if (!g_Memory.temp) {
+            assert(false);
+        }
+        g_Memory.bulk = (uint8_t*)g_Memory.temp + g_Memory.temp_memory;
+
+        g_Memory.current_bulk_offset = (uint8_t*)g_Memory.bulk;
+        g_Memory.current_temp_offset = (uint8_t*)g_Memory.temp;
+        
+        memset(g_Memory.temp, 0, total_size);
+
+    }
+
+    static void init_allocators(BaseAllocator* t_Global, BaseAllocator* t_Temporary)
+    {
+        g_Allocator = t_Global;
+        g_TempAllocator = t_Temporary;
+    }
+
+    static void destroy()
+    {
+        reset_temp();
+        g_Allocator->destroy();
+        g_TempAllocator->destroy();
+        munmap(g_Memory.temp, g_Memory.temp_memory + g_Memory.bulk_memory);
+    }
+
+    static char* push_size(size_t t_size)
+    {
+        auto res = (char*)g_Memory.current_bulk_offset;
+        memset(res, 0, t_size);
+        g_Memory.current_bulk_offset += t_size;
+        return res;
+    }
+
+    template<typename T>
+    static T* push_type()
+    {
+        auto res = (T*)g_Memory.current_bulk_offset;
+        memset(res, 0, sizeof(T));
+        g_Memory.current_bulk_offset += sizeof(T);
+        return res;
+    }
+
+    template<typename T>
+    static T* push_array(size_t t_count)
+    {
+        auto res = (T*)g_Memory.current_bulk_offset;
+        memset(res, 0, sizeof(T)*t_count);
+        g_Memory.current_bulk_offset += sizeof(T)*t_count;
+        return res;
+    }
+
+    static char* push_size_temp(size_t t_size)
+    {
+        auto res = (char*)g_Memory.current_temp_offset;
+        g_Memory.current_temp_offset += t_size;
+        return res;
+    }
+
+    template<typename T>
+    static T* push_type_temp()
+    {
+        auto res = (T*)g_Memory.current_temp_offset;
+        memset(res, 0, sizeof(T));
+        g_Memory.current_temp_offset += sizeof(T);
+        return res;
+    }
+
+    template<typename T>
+    static T* push_array_temp(size_t t_count)
+    {
+        auto res = (T*)g_Memory.current_temp_offset;
+        memset(res, 0, sizeof(T)*t_count);
+        g_Memory.current_temp_offset += sizeof(T)*t_count;
+        return res;
+    }
+
+    static void reset_temp()
+    {
+        g_Memory.current_temp_offset = (uint8_t*)g_Memory.temp;
+    }
+
+};

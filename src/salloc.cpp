@@ -1,16 +1,7 @@
 #include <iostream>
 
 #include "memory.hpp"
-#include "allocators/general_allocator.hpp"
-#include "allocators/arena_allocator.hpp"
-#include "allocators/fallback_allocator.hpp"
-#include "allocators/malloc_allocator.hpp"
-#include "allocators/segregator_allocator.hpp"
-#include "allocators/stack_allocator.hpp"
-#include "allocators/cascade_allocator.hpp"
-#include "allocators/linear_allocator.hpp"
-#include "allocators/tracking_allocator.hpp"
-#include "allocators/bump_allocator.hpp"
+#include "allocators.hpp"
 
 struct Name
 {
@@ -22,22 +13,12 @@ struct Name
 
 int main()
 {
-    g_Memory.init_memory(Megabytes(1), Megabytes(128));
+    MainAllocator globalAllocator;
+    TempAllocator tempAllocator;
+    Memory::init_memory(Megabytes(1), Megabytes(128));
+    Memory::init_allocators(&globalAllocator, &tempAllocator);
+    DEFER { Memory::destroy();};
     
-    using ArenaAllocator = FixedArenaAllocator<Mallocator, sizeof(Block), 58>;
-    using BlockAllocator = CascadeAllocator<ArenaAllocator, FallbackAllocator<LinearAllocator<Mallocator, 512*2>, Mallocator>>;
-
-    using LargeAllocator = GeneralAllocator<BlockAllocator, BumpAllocator, Megabytes(64)>;
-    using SmallAllocator = FallbackAllocator<GeneralAllocator<BlockAllocator, Mallocator, Megabytes(4)>, Mallocator>;
-    using General = Segregator<256, SmallAllocator, LargeAllocator>;    
-    
-    General allocator;
-    
-
-    // DEFER {
-    //     allocator.destroy();
-    //     g_Memory.destroy();
-    // };
 
     // for (size_t i = 0; i < 10; ++i) {
     //     [[maybe_unused]]auto blk = allocate_type<Name>(allocator, 40);
