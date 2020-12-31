@@ -28,14 +28,14 @@ struct BaseAllocator
 struct MemoryState
 {
 
-    size_t temp_memory{0};
-    size_t bulk_memory{0};
+    size_t m_TempMemorySize{0};
+    size_t m_BulkMemorySize{0};
 
-    void* temp{nullptr};
-    void* bulk{nullptr};
+    uint8_t* m_TempMemory{nullptr};
+    uint8_t* m_BulkMemory{nullptr};
 
-    uint8_t* current_bulk_offset{nullptr};
-    uint8_t* current_temp_offset{nullptr};
+    uint8_t* m_BulkMemoryOffset{nullptr};
+    uint8_t* m_TempMemoryOffset{nullptr};
 };
 
 template<typename T>
@@ -94,34 +94,6 @@ inline size_t roundToAlign(size_t t_size)
     return a << 4;
 }
 
-template<typename T, typename Allocator>
-TypedBlock<T> allocate_type(Allocator& allocator, size_t count = 1)
-{
-    auto res = allocator.allocate(sizeof(T)*count);
-    return {(T*)res.memory, res.size};
-
-}
-
-template<typename T, typename Allocator>
-TypedBlock<T> allocate_type(Allocator* allocator, size_t count = 1)
-{
-    auto res = allocator->allocate(sizeof(T)*count);
-    return {(T*)res.memory, res.size};
-
-}
-
-template< typename Allocator, typename T>
-void deallocate_type(Allocator& allocator, TypedBlock<T> block)
-{
-    allocator.deallocate({(char*)block.memory, block.size});
-}
-
-template< typename Allocator, typename T>
-void deallocate_type(Allocator* allocator, TypedBlock<T> block)
-{
-    allocator->deallocate({(char*)block.memory, block.size});
-}
-
 template<typename Allocator>
 struct WrappedAllocator : BaseAllocator
 {
@@ -163,21 +135,21 @@ struct Memory
     static void init_memory(size_t temp_size, size_t bulk_size)
     {
         // Todo(Stan): Add error checking here!
-        g_Memory.temp_memory = temp_size;
-        g_Memory.bulk_memory = bulk_size;
+        g_Memory.m_TempMemorySize = temp_size;
+        g_Memory.m_BulkMemorySize = bulk_size;
 
-        const size_t total_size = g_Memory.temp_memory + g_Memory.bulk_memory;
+        const size_t total_size = g_Memory.m_TempMemorySize + g_Memory.m_BulkMemorySize;
 
-        g_Memory.temp = mmap ( NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
-        if (!g_Memory.temp) {
+        g_Memory.m_TempMemory = (uint8_t*)mmap ( NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
+        if (!g_Memory.m_TempMemory) {
             assert(false);
         }
-        g_Memory.bulk = (uint8_t*)g_Memory.temp + g_Memory.temp_memory;
+        g_Memory.m_BulkMemory = (uint8_t*)g_Memory.m_TempMemory + g_Memory.m_TempMemorySize;
 
-        g_Memory.current_bulk_offset = (uint8_t*)g_Memory.bulk;
-        g_Memory.current_temp_offset = (uint8_t*)g_Memory.temp;
+        g_Memory.m_BulkMemoryOffset = (uint8_t*)g_Memory.m_BulkMemory;
+        g_Memory.m_TempMemoryOffset = (uint8_t*)g_Memory.m_TempMemory;
         
-        memset(g_Memory.temp, 0, total_size);
+        memset(g_Memory.m_TempMemory, 0, total_size);
 
     }
 
@@ -192,63 +164,110 @@ struct Memory
         reset_temp();
         g_Allocator->destroy();
         g_TempAllocator->destroy();
-        munmap(g_Memory.temp, g_Memory.temp_memory + g_Memory.bulk_memory);
+        munmap(g_Memory.m_TempMemory, g_Memory.m_TempMemorySize + g_Memory.m_BulkMemorySize);
     }
 
     static char* push_size(size_t t_size)
     {
-        auto res = (char*)g_Memory.current_bulk_offset;
+        auto res = (char*)g_Memory.m_BulkMemoryOffset;
         memset(res, 0, t_size);
-        g_Memory.current_bulk_offset += t_size;
+        g_Memory.m_BulkMemoryOffset += t_size;
         return res;
     }
 
     template<typename T>
     static T* push_type()
     {
-        auto res = (T*)g_Memory.current_bulk_offset;
+        auto res = (T*)g_Memory.m_BulkMemoryOffset;
         memset(res, 0, sizeof(T));
-        g_Memory.current_bulk_offset += sizeof(T);
+        g_Memory.m_BulkMemoryOffset += sizeof(T);
         return res;
     }
 
     template<typename T>
     static T* push_array(size_t t_count)
     {
-        auto res = (T*)g_Memory.current_bulk_offset;
+        auto res = (T*)g_Memory.m_BulkMemoryOffset;
         memset(res, 0, sizeof(T)*t_count);
-        g_Memory.current_bulk_offset += sizeof(T)*t_count;
+        g_Memory.m_BulkMemoryOffset += sizeof(T)*t_count;
         return res;
     }
 
     static char* push_size_temp(size_t t_size)
     {
-        auto res = (char*)g_Memory.current_temp_offset;
-        g_Memory.current_temp_offset += t_size;
+        auto res = (char*)g_Memory.m_TempMemoryOffset;
+        g_Memory.m_TempMemoryOffset += t_size;
         return res;
     }
 
     template<typename T>
     static T* push_type_temp()
     {
-        auto res = (T*)g_Memory.current_temp_offset;
+        auto res = (T*)g_Memory.m_TempMemoryOffset;
         memset(res, 0, sizeof(T));
-        g_Memory.current_temp_offset += sizeof(T);
+        g_Memory.m_TempMemoryOffset += sizeof(T);
         return res;
     }
 
     template<typename T>
     static T* push_array_temp(size_t t_count)
     {
-        auto res = (T*)g_Memory.current_temp_offset;
+        auto res = (T*)g_Memory.m_TempMemoryOffset;
         memset(res, 0, sizeof(T)*t_count);
-        g_Memory.current_temp_offset += sizeof(T)*t_count;
+        g_Memory.m_TempMemoryOffset += sizeof(T)*t_count;
         return res;
     }
 
     static void reset_temp()
     {
-        g_Memory.current_temp_offset = (uint8_t*)g_Memory.temp;
+        g_Memory.m_TempMemoryOffset = (uint8_t*)g_Memory.m_TempMemory;
     }
 
 };
+
+
+template<typename T, typename Allocator>
+TypedBlock<T> allocate_type(Allocator& allocator, size_t count = 1)
+{
+    auto res = allocator.allocate(sizeof(T)*count);
+    return {(T*)res.memory, res.size};
+
+}
+
+template<typename T, typename Allocator>
+TypedBlock<T> allocate_type(Allocator* allocator, size_t count = 1)
+{
+    auto res = allocator->allocate(sizeof(T)*count);
+    return {(T*)res.memory, res.size};
+
+}
+
+template< typename Allocator, typename T>
+void deallocate_type(Allocator& allocator, const TypedBlock<T>& block)
+{
+    allocator.deallocate({(char*)block.memory, block.size});
+}
+
+template< typename Allocator, typename T>
+void deallocate_type(Allocator* allocator, const TypedBlock<T>& block)
+{
+    allocator->deallocate({(char*)block.memory, block.size});
+}
+
+template< typename T>
+void galloc(size_t count = 1)
+{
+    allocate_type<T>(g_Allocator, count);
+}
+
+template< typename T>
+void gdealloc(const TypedBlock<T>& block)
+{
+    deallocate_type(g_Allocator, block);
+}
+
+template< typename T>
+void talloc(size_t count = 1)
+{
+    allocate_type<T>(g_Allocator, count);
+}

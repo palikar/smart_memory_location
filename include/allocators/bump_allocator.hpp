@@ -10,7 +10,8 @@ struct BumpAllocator
     {
         auto size = roundToAlign(t_Size);
         auto memory = Memory::push_size(size);
-        if (memory >= (char*)g_Memory.bulk + g_Memory.bulk_memory)
+
+        if (memory >= (char*)g_Memory.m_BulkMemory + g_Memory.m_BulkMemorySize)
         {
             return {};
         }
@@ -41,7 +42,7 @@ struct TempBumpAllocator
         auto memory = Memory::push_size_temp(size);
         
         
-        if ((char*)g_Memory.temp + g_Memory.temp_memory <= memory)
+        if ((char*)g_Memory.m_TempMemory + g_Memory.m_TempMemorySize <= memory)
         {
             return {};
         }
