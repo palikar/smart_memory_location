@@ -25,7 +25,7 @@
 // the CRCs of wholes.  There are also cryptographic hashes, but those are even 
 // slower than MD5.
 //
-
+#pragma once
 #include <stddef.h>
 
 #ifdef _MSC_VER

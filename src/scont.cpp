@@ -6,6 +6,7 @@
 #include "containers/vector.hpp"
 #include "containers/map.hpp"
 #include "containers/string.hpp"
+#include "containers/stringview.hpp"
 
 struct Name
 {
@@ -23,33 +24,43 @@ int main()
     Memory::init_memory(Megabytes(1), Megabytes(128));
     Memory::init_allocators(&globalAllocator, &tempAllocator);
     DEFER { Memory::destroy();};
-    
-    Map<String, float> map;
-    map.init();
- 
-    map.push_back("Stanislav", 42);
-    map.push_back("Marina", 44);
-    map.push_back("Marina_1", 44);
-    map.push_back("Marina_2", 445);
-    map.push_back("Marina_3", 446);
-    map.push_back("Marina_4", 447);
-    map.push_back("Marina_5", 448);
-    map.push_back("Marina_6", 449);
-    map.push_back("Marina_7", 4410);
-    map.push_back("Marina_8", 4411);
 
-    std::cout << "............" << "\n";
+    StringView view{"this is sick"};
+    std::cout << view.data() << "\n";
+
+    std::cout << hash<StringView>::hash_value(view) << "\n";
+
+    String str{"this is so sick!"};
+    std::cout << make_stringview(str).data() << "\n";
+
+    str.destory();
     
-    std::cout << map["Stanislav"] << '\n';
-    std::cout << map["Marina"] << '\n';
-    std::cout << map["Marina_1"] << '\n';
-    std::cout << map["Marina_2"] << '\n';
-    std::cout << map["Marina_3"] << '\n';
-    std::cout << map["Marina_4"] << '\n';
-    std::cout << map["Marina_5"] << '\n';
-    std::cout << map["Marina_6"] << '\n';
-    std::cout << map["Marina_7"] << '\n';
-    std::cout << map["Marina_8"] << '\n';
+    // Map<String, float> map;
+    // map.init();
+ 
+    // map.push_back("Stanislav", 42);
+    // map.push_back("Marina", 44);
+    // map.push_back("Marina_1", 44);
+    // map.push_back("Marina_2", 445);
+    // map.push_back("Marina_3", 446);
+    // map.push_back("Marina_4", 447);
+    // map.push_back("Marina_5", 448);
+    // map.push_back("Marina_6", 449);
+    // map.push_back("Marina_7", 4410);
+    // map.push_back("Marina_8", 4411);
+
+    // std::cout << "............" << "\n";
+    
+    // std::cout << map["Stanislav"] << '\n';
+    // std::cout << map["Marina"] << '\n';
+    // std::cout << map["Marina_1"] << '\n';
+    // std::cout << map["Marina_2"] << '\n';
+    // std::cout << map["Marina_3"] << '\n';
+    // std::cout << map["Marina_4"] << '\n';
+    // std::cout << map["Marina_5"] << '\n';
+    // std::cout << map["Marina_6"] << '\n';
+    // std::cout << map["Marina_7"] << '\n';
+    // std::cout << map["Marina_8"] << '\n';
 
     
 
