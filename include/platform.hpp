@@ -109,7 +109,7 @@ struct Platform
         fstat(t_Fd.fd, &statBuf);
         const auto fileSize =  statBuf.st_size;
 
-        ByteBlock fileContents = allocate_type<char>(g_Allocator, fileSize);
+        ByteBlock fileContents = galloc<char>( fileSize);
         size_t currentOffset = 0;
 
         // @Note(Stan) : This can probably be empirically optimized

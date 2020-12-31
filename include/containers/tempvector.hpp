@@ -5,7 +5,7 @@
 
 
 template<typename T>
-struct Vector
+struct TempVector
 {
     using BlockType = TypedBlock<char>;
 
@@ -15,7 +15,7 @@ struct Vector
 
     void init(size_t t_Size = 16)
     {
-        m_Data = galloc<char>( t_Size*sizeof(T));
+        m_Data = talloc<char>(t_Size*sizeof(T));
         m_Count = 0;
         m_Size = m_Data.size / sizeof(T);
     }
@@ -49,7 +49,7 @@ struct Vector
         if (t_Size < m_Size)
         {
             const auto newSize = t_Size;
-            auto newBlock = galloc<char>(newSize*sizeof(T));
+            auto newBlock = talloc<char>(newSize*sizeof(T));
             m_Size = newBlock.size / sizeof(T);
             memcpy(newBlock.memory, m_Data.memory, m_Data.size);
             m_Data = newBlock;
@@ -140,16 +140,16 @@ struct Vector
 
     void destory()
     {
-        gdealloc(m_Data);
+
     }
-    
+
 
   private:
 
     void grow()
     {
         const auto newSize = (2*m_Size);
-        auto newBlock = galloc<char>(newSize*sizeof(T));
+        auto newBlock = talloc<char>(newSize*sizeof(T));;
         m_Size = newBlock.size / sizeof(T);
         memcpy(newBlock.memory, m_Data.memory, m_Data.size);
         m_Data = newBlock;
@@ -158,10 +158,9 @@ struct Vector
     void shrink()
     {
         const auto newSize = (m_Size/2);
-        auto newBlock = galloc<char>(newSize*sizeof(T));
+        auto newBlock = talloc<char>(newSize*sizeof(T));;
         m_Size = newBlock.size / sizeof(T);
         memcpy(newBlock.memory, m_Data.memory, m_Count*sizeof(T));
-        gdealloc(m_Data);
         m_Data = newBlock;
     }
 

@@ -2,19 +2,12 @@
 
 #include "memory.hpp"
 #include "utils.hpp"
+#include "map.hpp"
 
 
-
-template<typename Key, typename Value>
-struct KeyValue
-{
-    Key key{0};
-    Value value{0};
-
-};
 
 template<typename Key, typename T>
-struct Map
+struct TempMap
 {
     using PairType = KeyValue<Key, T>;
     using BlockType = TypedBlock<char>;
@@ -26,7 +19,7 @@ struct Map
 
     void init(size_t t_Size = 16)
     {
-        m_Data = galloc<char>((t_Size + 8)*sizeof(PairType));
+        m_Data = talloc<char>((t_Size + 8)*sizeof(PairType));
         memset(m_Data.memory, 0 , m_Data.size);
         m_Count = 0;
         m_Size = m_Data.size / sizeof(PairType);
@@ -199,7 +192,7 @@ struct Map
 
     void destory()
     {
-        gdealloc(m_Data);
+     
     }
     
   private:
@@ -208,7 +201,7 @@ struct Map
     {
         const auto newSize = (2*m_Size);
 
-        auto newBlock = galloc<char>(newSize*sizeof(PairType));
+        auto newBlock = talloc<char>(newSize*sizeof(PairType));
         m_Size = newBlock.size / sizeof(PairType);
         auto oldBlock = m_Data;
         m_Data = newBlock;
@@ -231,7 +224,7 @@ struct Map
     void shrink()
     {
         const auto newSize = (m_Size/2);
-        auto newBlock = galloc<char>(newSize*sizeof(PairType));
+        auto newBlock = talloc<char>(newSize*sizeof(PairType));
         m_Size = newBlock.size / sizeof(PairType);
         memcpy(newBlock.memory, m_Data.memory, m_Count*sizeof(PairType));
         m_Data = newBlock;

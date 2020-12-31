@@ -2,11 +2,7 @@
 
 #include "memory.hpp"
 #include "allocators.hpp"
-
-#include "containers/vector.hpp"
-#include "containers/map.hpp"
-#include "containers/string.hpp"
-#include "containers/stringview.hpp"
+#include "containers.hpp"
 
 struct Name
 {
@@ -25,29 +21,70 @@ int main()
     Memory::init_allocators(&globalAllocator, &tempAllocator);
     DEFER { Memory::destroy();};
 
-    StringView view{"this is sick"};
-    std::cout << view.data() << "\n";
+    StringMap<int> m;
+    m.init();
 
-    std::cout << hash<StringView>::hash_value(view) << "\n";
+    m.push_back("Stanislav", 32);
 
-    String str{"this is so sick!"};
-    std::cout << make_stringview(str).data() << "\n";
+    std::cout << m["Stanislav"] << "\n";
 
-    str.destory();
+    // List<int> ints;
+    // ints.init();
+
+    // ints.push_back(43);
+    // ints.push_back(44);
+    // ints.push_back(45);
+
+    // std::cout << ints[0] << "\n";
+    // std::cout << ints[1] << "\n";
+    // std::cout << ints[2] << "\n";
+
+    // std::cout << ints.front() << "\n";
+    // std::cout << ints.back() << "\n";
+
+    // ints.destroy();
+
+// TempVector<int> ints;
+    // ints.init();
+
+    // ints.push_back(23);
+    // ints.push_back(24);
+    // ints.push_back(25);
+    // ints.push_back(26);
+
+    // for (size_t i = 0; i < ints.count(); ++i)
+	// {
+	//     std::cout << ints[i] << "\n";
+	// }
+
+    // ints.destory();
+
+    // TempString tr{"dslkaö"};
+    // std::cout << tr.data() << "\n";
+    // tr.destory();
     
-    // Map<String, float> map;
+
+    // StringView view{"this is sick"};
+    // std::cout << view.data() << "\n";
+
+    // std::cout << hash<StringView>::hash_value(view) << "\n";
+
+    // String str{"this is so sick!"};
+    // std::cout << str.data() << "\n";
+    // str.destory();
+    
+    // TempMap<int, float> map;
     // map.init();
  
-    // map.push_back("Stanislav", 42);
-    // map.push_back("Marina", 44);
-    // map.push_back("Marina_1", 44);
-    // map.push_back("Marina_2", 445);
-    // map.push_back("Marina_3", 446);
-    // map.push_back("Marina_4", 447);
-    // map.push_back("Marina_5", 448);
-    // map.push_back("Marina_6", 449);
-    // map.push_back("Marina_7", 4410);
-    // map.push_back("Marina_8", 4411);
+    // map.push_back(2, 2.3);
+    // map.push_back(3, 23.3);
+    // map.push_back(4, 42.3);
+    // map.push_back(5, 52.3);
+
+    // std::cout << map[2] << "\n";
+    // std::cout << map[3] << "\n";
+    // std::cout << map[4] << "\n";
+    // std::cout << map[5] << "\n";
 
     // std::cout << "............" << "\n";
     

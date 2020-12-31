@@ -18,7 +18,6 @@ struct CascadeAllocator : private Primary
 
     TypedBlock<AllocatorBlock<Allocator>> m_Allocators;
 
-
     MemoryBlock allocate(size_t t_Size)
     {
 

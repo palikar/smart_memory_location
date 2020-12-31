@@ -6,7 +6,7 @@
 
 #include <cstring>
 
-struct String
+struct TempString
 {
     using BlockType = TypedBlock<char>;
 
@@ -14,22 +14,22 @@ struct String
     size_t m_Count{0};
     size_t m_Size{0};
 
-    String()
+    TempString()
     {
      
     }
 
     void init(size_t t_Size) 
     {
-        m_Data = galloc<char>(t_Size*sizeof(char));
+        m_Data = talloc<char>(t_Size*sizeof(char));
         m_Size = m_Data.size;
         m_Count = 0;
     }
 
-    String(const char* buf)
+    TempString(const char* buf)
     {
         auto size = std::strlen(buf)+1;
-        m_Data = galloc<char>(size);
+        m_Data = talloc<char>(size);
         m_Count = size;
         strcpy(m_Data.memory, buf);
         m_Size = m_Data.size;
@@ -138,7 +138,6 @@ struct String
 
     void destory()
     {
-        gdealloc(m_Data);
     }
     
 
@@ -147,7 +146,7 @@ struct String
     void grow(size_t t_Size)
     {
         const auto newSize = t_Size;
-        auto newBlock = galloc<char>(newSize);
+        auto newBlock = talloc<char>(newSize);
         m_Size = newBlock.size;
         memcpy(newBlock.memory, m_Data.memory, m_Data.size);
         m_Data = newBlock;
@@ -156,7 +155,7 @@ struct String
     void shrink()
     {
         const auto newSize = (m_Size/2);
-        auto newBlock = galloc<char>(newSize);
+        auto newBlock = talloc<char>(newSize);
         m_Size = newBlock.size;
         memcpy(newBlock.memory, m_Data.memory, m_Count);
         m_Data = newBlock;
@@ -166,16 +165,16 @@ struct String
 };
 
 template <>
-struct hash<String> {
-    static size_t hash_value(const String& obj) noexcept {
+struct hash<TempString> {
+    static size_t hash_value(const TempString& obj) noexcept {
         return SpookyHash::Hash64(obj.data(), obj.count(), 0x435F4325F213AAB4);
     }
 };
 
 
 template <>
-struct compare<String> {
-    static int8_t cmp(const String& lhs, const String& rhs) noexcept {
+struct compare<TempString> {
+    static int8_t cmp(const TempString& lhs, const TempString& rhs) noexcept {
         if(lhs.m_Count != rhs.m_Count || !lhs.m_Data.memory || !rhs.m_Data.memory)
         {
             return -1;
@@ -186,14 +185,14 @@ struct compare<String> {
 
 
 template <>
-struct invalid<String> {
-    static int8_t is_invalid(const String& obj) noexcept {
+struct invalid<TempString> {
+    static int8_t is_invalid(const TempString& obj) noexcept {
         return std::numeric_limits<size_t>::max() == obj.m_Count ? 1 : -1;
     }
 
-    static String make_invalid() noexcept
+    static TempString make_invalid() noexcept
     {
-        String invalidString;
+        TempString invalidString;
         invalidString.set_invalid();
         return invalidString;
     }

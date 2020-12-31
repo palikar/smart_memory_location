@@ -14,7 +14,6 @@ inline size_t roundGood(size_t t_size)
     return v;
 }
 
-
 struct Block
 {
     char* memory;
@@ -24,7 +23,6 @@ struct Block
     TypedBlock<Block> next;
 
 };
-
 
 template<typename BlockAllocator, typename Allocator, size_t Size>
 struct GeneralAllocator : public BlockAllocator, public Allocator
@@ -113,6 +111,7 @@ struct GeneralAllocator : public BlockAllocator, public Allocator
 
     void destroy()
     {
+        
         Allocator::deallocate(m_BaseMemory);
         Allocator::destroy();
         BlockAllocator::destroy();

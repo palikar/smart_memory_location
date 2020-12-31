@@ -11,8 +11,8 @@
 struct StringView
 {
 
-    const char* m_Beginning;
-    size_t m_Count;
+    const char* m_Beginning{nullptr};
+    size_t m_Count{0};
 
 
     StringView()
@@ -27,6 +27,12 @@ struct StringView
         m_Count = strlen(t_Str);
     }
 
+    StringView(const char* t_Str, size_t t_Count)
+    {
+        m_Beginning = t_Str;
+        m_Count = t_Count;
+    }
+
     const char* data() const
     {
         return m_Beginning;
@@ -35,6 +41,11 @@ struct StringView
     size_t count() const
     {
         return m_Count;
+    }
+
+    operator bool()
+    {
+        return m_Count != 0;
     }
 
 };
@@ -47,7 +58,7 @@ StringView make_stringview(const char* t_Str)
 
 StringView make_stringview(const String& t_Str)
 {
-    return StringView(t_Str.data());
+    return StringView(t_Str.data(), t_Str.count());
 }
 
 

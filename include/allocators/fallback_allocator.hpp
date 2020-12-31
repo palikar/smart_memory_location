@@ -33,15 +33,12 @@ struct FallbackAllocator
     {
         return m_Primary.owns(ptr) || m_Fallback.owns(ptr);
     }
-
     
     void destroy()
     {
         m_Primary.destroy();
         m_Fallback.destroy();
-    }    
-
-
+    }
     
 };
 

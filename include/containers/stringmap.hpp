@@ -2,27 +2,22 @@
 
 #include "memory.hpp"
 #include "utils.hpp"
+#include "map.hpp"
+
+#include "stringview.hpp"
 
 
 
-template<typename Key, typename Value>
-struct KeyValue
+template<typename T>
+struct StringMap
 {
-    Key key{0};
-    Value value{0};
-
-};
-
-template<typename Key, typename T>
-struct Map
-{
+    using Key = StringView;
     using PairType = KeyValue<Key, T>;
     using BlockType = TypedBlock<char>;
 
     BlockType m_Data;
     size_t m_Count;
-    size_t m_Size;
-    
+    size_t m_Size;    
 
     void init(size_t t_Size = 16)
     {
@@ -30,7 +25,6 @@ struct Map
         memset(m_Data.memory, 0 , m_Data.size);
         m_Count = 0;
         m_Size = m_Data.size / sizeof(PairType);
-
 
     }
 
@@ -49,7 +43,6 @@ struct Map
 
         while (slot_memory->key && compare<Key>::cmp(slot_memory->key, t_Key) != 0)
         {
-            
             ++slot_memory;
         
             if(is_passed_the_end(slot_memory))
@@ -206,6 +199,7 @@ struct Map
     
     void grow()
     {
+        
         const auto newSize = (2*m_Size);
 
         auto newBlock = galloc<char>(newSize*sizeof(PairType));
